@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+
+  "name": "Pop Culture Teacher",
+  "version": "0.1.4",
+  "description": "Highlights famous movie quotes and their paraphrases",
+  "icons": { "16": "images/icon.png",
+           "48": "images/icon.png",
+          "128": "images/icon.png" },
+  "content_scripts": [
+    {
+    "matches": ["*://*/*"],
+    "js": ["get.js"],
+    "run_at":"document_idle",
+	"css":["style.css"]
+  }
+]
+
+}

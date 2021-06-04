@@ -1,0 +1,33 @@
+#highlight {
+color:dodgerBlue;
+border:dotted
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  
+  border-bottom: 3px dotted blue; /* If you want dots under the hoverable text */
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  height: 220px;
+  width: 1000px;;
+  background-color: black;
+  color: #fff;
+ 
+  padding: 5px;
+  position: relative;
+  z-index: -0.25;
+  top: 10;
+  left: 0;
+  margin-left: 0;
+  font-size: 14px;
+  text-align:left;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

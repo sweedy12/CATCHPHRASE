@@ -1,0 +1,101 @@
+0312 Update:
+
+S2S WITH multiple outputs
+automata deduction
+
+
+Dafna meeting summary:
+	1. Try S2S with multiple outputs
+	2. Try to take the output of the S2S, which are patterns. For each pattern we may sample
+	some sentences that match it. Then, for each set of sentences, we need to find the best automata 
+	to describe the set. If the patterns the S2S tagger outputs are too general, this should fix it.
+	3. We can maybe try the same approach on the SVM cluster 
+
+Chrome Extension:
+	1. I used a python server to perform the main calculations.
+	2. Logic is done, but we still need to extract the patterns (or: run Sopa)
+	3. Overall this works now.
+	
+S2S snowclone task:
+	1. Use NER output of words (combined with current word embedding + POS tag information) - currently running, hoping for
+	improvement.
+
+
+Extracting the best patterns:
+	1. I've read the SoPA paper Roy Schwartz sent (and authored). Seems like this model was meant for us, but I have some questions.
+
+	ideas:
+	3. Can we maybe treat this like an anomaly detection problem? detecting the "bad" references and leaving only good ones might
+	allow for better pattern extraction (not sure)
+	2. If we do end up using the supervised SoPA suggestion, we can maybe use the methods shown in the paper
+	in order to extract the best fitting patterns out of the WFSAs - and then use them as the patterns.
+
+
+
+
+Sopa questions and ideas:
+	
+	0. I summarized the paper. Here are some answers to Roy's questions:
+		a. data per template - varies. I guess running on larger Reddit DBs can solve data scarcity.
+		b. We have negative examples (or else there would be no problem) - for some less than others. 
+		c. Yes, with high agreement we had less negative examples (even none in some cases, but I guess they 
+		can be mined).
+
+	1. I can use this model on the cluster output, after it's been tagged. So each cluster
+	will serve as the source for train/val/test sets, and for each cluster we will learn the SoPA model
+	best fitted to the task. But this requires tagging each sentence in the cluster, or at least some.
+
+	2. I can use the SoPA model as the clusterer model. This means I can have pass the (anchor, candidate) pair
+	through the Sopa model (twice) to get 2 sentence embeddings, and then pass them through MLP or
+	something similar to predict it the candidate fits the anchor's cluster or not.
+	This makes less sense as the learned patterns might not generalize to unseen sentences (while some of the 
+	statistics I pulled out and passed on to SVM as features will hopefully do).
+
+	3. I might also be able to use this model at the S2S mission we used bi-LSTMs for.
+	
+	However,I feel that taking a supervised approach here isn't the best way to go about it.
+	This means I should manually tag 10-20 examples of each clutser we've mined before being able
+	to predict whether a sentenec is a reference or not.
+	This also means we're more or less trying to solve the same problem again.
+	
+	If we use SoPA in the first clustering stage, perhaps along with the former features,
+	I don't know if training it on cross-original-sentence data is an appropriate choice. As SoPA ultimately learns
+	"soft patterns" - they should definitely vary from sentence to sentence.
+	The current clusterer seems to perform OK even on original sentences of which it hasn't seen 
+	any examples of during training ("the first rule of fight club..."). Could this generalization 
+	happen using SoPA?
+	
+	Can we maybe use something to create "pseudo-labels" for the sentences automatically? 
+	I thought of taking the SVM confidence levels (maybe normalize) as pseudo-labels. This assumes that
+	SVM will give high-confidence to the better fitting examples.
+	
+
+Chrome Extension questionnaire:
+	1. I gathered some (~25) reddit pages with examples of snowclone usages (captured by our clusterer)
+	2. 
+	
+The Framework (reminder, or what I did so far):
+
+I also prepared a PPT slideshow (for our "friends seminar") that shows the framework.
+
+	0. build a classifier to detect whether a quote (given the movie its taken from) is memorable or not. Can be used to mine
+	memorable quotes.
+	1. The clusterer model gets (anchor, candidate) pair. It uses the S2S model to create anchor_pattern.
+	2. Then, we extract some collection of distance\surprisement\else of features, and use SVM to detect whether the candidate
+	belongs in the anchor's  cluster.
+	3. We now have a cluster for each original sentence, and we want to use them to find the best fitting patterns.
+	4. Use the extracted patterns in our chrome extension as regex.
+
+
+Stack, or: what can we do next (if time permits)
+	1. We can use our tool to create a DB of movie-quote-references, and perform similar tests to what was done in the 
+	original cornell paper - i.e. we can check if movie references have the same lingual properties that were 
+	found for the original movie quote DB. We may also find something to help us improve the model.
+	2. Use this pipeline for a different domain (I thought of Cliches, which are highly related to Snowclones as we've learned).
+	3. We can try and do some linguistic analysis on the S2S tagger or the references we've found (which POS tends to be replaced more for the S2S tagger,
+	or maybe testing some kind of semantic similarity of the references we've found for some quote).
+	4. Can we maybe try and say something about the context in which these references appear? We're able to find references, and so we can go over
+	the web and search the neighboring sentences (or: previous and next comments in a thread). We can maybe try and say something about the semantics
+	of these references by using their (hopefully less obscure) context surroundings.
+	5. By doing (4) we may also improve the clusterer a bit more - we can somehow incorporate some information about the surroundings of the sentence
+	when deciding whether it is a reference or not.
