@@ -35,7 +35,7 @@ The dataset curated for this task consists of 3850 pairs of (seed,candidate) pai
 The entire dataset can be found at snowclone_classification/snowclone_reference_data. </br>
 The code for training and validating both models can be run the following way: </br>
 <h5> SVM :  </h5> for training, validating and saving the best feature-based SVM model, simply run SVMFinder.py
-<h5> SVM : </h5> for training, validating and saving the best RoBERTa model for this task, simply run roberta_snowclone.py
+<h5> RoBERTa : </h5> for training, validating and saving the best RoBERTa model for this task, simply run roberta_snowclone.py
 
 
     
